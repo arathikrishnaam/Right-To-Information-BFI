@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>File RTI — RTI-Saarthi</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>"/>
+  <link rel="stylesheet" href="css/main.css"/>
+  <link rel="stylesheet" href="css/wizard.css"/>
+</head>
+<body>
+
+<!-- ── Navbar ──────────────────────────────────────── -->
+<nav class="navbar">
+  <div class="container">
+    <a class="navbar-brand" href="index.html"><span class="flag">🇮🇳</span>RTI-<span class="saarthi">Saarthi</span></a>
+    <div class="navbar-links">
+      <a href="index.html">Home</a>
+      <a href="file-rti.html" class="active">File RTI</a>
+      <a href="dashboard.html">Track</a>
+      <select class="lang-select" id="langSelect">
+        <option value="en">🇬🇧 English</option>
+        <option value="hi">🇮🇳 हिंदी</option>
+      </select>
+    </div>
+  </div>
+</nav>
+
+<div class="wizard-container">
+  <div class="wizard-header">
+    <h1>📝 File Your RTI Application</h1>
+    <p>AI-powered. Legally valid. Takes just 3 minutes.</p>
+  </div>
+
+  <!-- ── Progress Bar ─────────────────────────────── -->
+  <div class="progress-bar" id="progressBar">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    <div class="step-indicator active" data-step="1"><div class="step-circle">1</div><div class="step-label" data-i18n="step1">Your Query</div></div>
+    <div class="step-indicator" data-step="2"><div class="step-circle">2</div><div class="step-label" data-i18n="step2">Your Details</div></div>
+    <div class="step-indicator" data-step="3"><div class="step-circle">3</div><div class="step-label" data-i18n="step3">Review Draft</div></div>
+    <div class="step-indicator" data-step="4"><div class="step-circle">4</div><div class="step-label" data-i18n="step4">Confirm & File</div></div>
+    <div class="step-indicator" data-step="5"><div class="step-circle">✓</div><div class="step-label" data-i18n="step5">Done!</div></div>
+  </div>
+
+  <!-- ═══ STEP 1: Question ════════════════════════════════ -->
+  <div class="step-panel active card" data-step="1">
+    <h2 style="color:var(--blue);font-size:1.3rem;margin-bottom:0.3rem">Step 1: What information do you need?</h2>
+    <p style="color:var(--gray);margin-bottom:1.5rem;font-size:0.95rem">Ask in Hindi or English. Our AI will understand and find the right department.</p>
+
+    <!-- Voice Input -->
+    <div class="voice-area" id="voiceArea">
+      <button class="voice-btn" id="voiceBtn" type="button" title="Click to speak">🎤</button>
+      <div>
+        <div style="font-weight:600;color:var(--blue)">Click to speak in Hindi or English</div>
+        <div class="voice-hint">Bole ya likhein: "मेरी सड़क कब बनेगी?" or "When will my road be repaired?"</div>
+      </div>
+      <div class="voice-transcript hidden" id="voiceTranscript"></div>
+    </div>
+    <div id="voiceError" class="alert alert-error hidden"></div>
+
+    <!-- Text Input -->
+    <div class="form-group">
+      <label for="questionInput">Or type your question <span class="required">*</span></label>
+      <textarea
+        id="questionInput"
+        placeholder="e.g. 'When will the road in my locality be repaired?' or 'मेरी राशन कार्ड की स्थिति क्या है?'"
+        rows="4"
+        data-i18n="question_placeholder"
+        data-i18n-attr="placeholder"
+      ></textarea>
+      <div style="font-size:0.82rem;color:var(--gray);margin-top:0.4rem" data-i18n="hindi_example">
+        Or in Hindi: "मेरी सड़क कब बनेगी?"
+      </div>
+    </div>
+
+    <div id="step1Alert" class="alert hidden"></div>
+
+    <div class="wizard-actions">
+      <div></div>
+      <button class="btn btn-primary" id="analyzeBtn" type="button" data-i18n="analyze_btn">🤖 Analyze with AI</button>
+    </div>
+
+    <!-- Analysis Result (hidden until analyzed) -->
+    <div id="analysisResult" class="hidden" style="margin-top:1.5rem">
+      <div class="analysis-card">
+        <div class="analysis-header">
+          <span>🤖</span>
+          <h3>AI Analysis Result</h3>
+          <span class="ai-badge">Claude Sonnet</span>
+        </div>
+        <div class="analysis-body">
+          <div id="analysisCategory"></div>
+          <div style="margin-bottom:0.75rem">
+            <strong style="color:var(--blue)">Subject:</strong>
+            <span id="analysisSubject" style="font-size:0.95rem;color:#374151"></span>
+          </div>
+          <div id="analysisLang" style="font-size:0.82rem;color:var(--gray);margin-bottom:1rem"></div>
+          <div id="analysisUrgency" style="margin-bottom:1rem"></div>
+          <strong style="color:var(--blue);font-size:0.9rem">✅ Suggested RTI Questions (click to select):</strong>
+          <ul class="suggested-questions" id="suggestedQuestions" style="margin-top:0.5rem"></ul>
+        </div>
+      </div>
+      <div class="wizard-actions">
+        <div></div>
+        <button class="btn btn-primary" id="nextStep1Btn" type="button">Continue → Fill Your Details</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 2: Applicant Details ══════════════════════════ -->
+  <div class="step-panel card" data-step="2">
+    <h2 style="color:var(--blue);font-size:1.3rem;margin-bottom:0.3rem">Step 2: Your Details</h2>
+    <p style="color:var(--gray);margin-bottom:1.5rem;font-size:0.95rem">Required for the RTI application. Your information is kept confidential.</p>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="applicantName" data-i18n="name_label">Full Name <span class="required">*</span></label>
+        <input type="text" id="applicantName" placeholder="As on Aadhaar card" autocomplete="name"/>
+      </div>
+      <div class="form-group">
+        <label for="applicantMobile" data-i18n="mobile_label">Mobile Number <span class="required">*</span></label>
+        <input type="tel" id="applicantMobile" placeholder="10-digit mobile number" maxlength="10" autocomplete="tel"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="applicantEmail" data-i18n="email_label">Email Address <span class="required">*</span></label>
+      <input type="email" id="applicantEmail" placeholder="you@example.com" autocomplete="email"/>
+    </div>
+    <div class="form-group">
+      <label for="applicantAddress" data-i18n="address_label">Your Full Address <span class="required">*</span></label>
+      <textarea id="applicantAddress" placeholder="House No, Street, Locality, City, PIN Code" rows="3"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="applicantState" data-i18n="state_label">Your State <span class="required">*</span></label>
+      <select id="applicantState">
+        <option value="">-- Select State --</option>
+        <option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option>
+        <option>Bihar</option><option>Chhattisgarh</option><option>Delhi</option><option>Goa</option>
+        <option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option>
+        <option>Jharkhand</option><option>Karnataka</option><option>Kerala</option>
+        <option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option>
+        <option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option>
+        <option>Odisha</option><option>Punjab</option><option>Rajasthan</option>
+        <option>Sikkim</option><option>Tamil Nadu</option><option>Telangana</option>
+        <option>Tripura</option><option>Uttar Pradesh</option><option>Uttarakhand</option>
+        <option>West Bengal</option><option>Puducherry</option>
+      </select>
+    </div>
+
+    <!-- BPL Toggle -->
+    <div class="form-group">
+      <label class="toggle-row" for="bplToggle">
+        <span class="toggle">
+          <input type="checkbox" id="bplToggle"/>
+          <span class="toggle-slider"></span>
+        </span>
+        I am a BPL (Below Poverty Line) cardholder — Filing fee exempt
+      </label>
+      <div id="bplCardField" class="hidden" style="margin-top:0.75rem">
+        <input type="text" id="bplCardNo" placeholder="BPL Card Number"/>
+      </div>
+    </div>
+
+    <div id="step2Alert" class="alert hidden"></div>
+
+    <div class="wizard-actions">
+      <button class="btn btn-outline" id="backStep2Btn" type="button">← Back</button>
+      <button class="btn btn-primary" id="nextStep2Btn" type="button">Generate RTI Draft →</button>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 3: Review Draft ════════════════════════════════ -->
+  <div class="step-panel card" data-step="3">
+    <h2 style="color:var(--blue);font-size:1.3rem;margin-bottom:0.3rem">Step 3: Review Your RTI Application</h2>
+    <p style="color:var(--gray);margin-bottom:1.5rem;font-size:0.95rem">AI has drafted your RTI. Review it below before filing.</p>
+
+    <!-- Loading state -->
+    <div id="draftLoading" style="text-align:center;padding:3rem">
+      <div class="spinner"></div>
+      <p style="margin-top:1rem;color:var(--gray)">AI Agents are working...<br/>
+        <span style="font-size:0.85rem">Routing to department → Drafting application → Calculating success probability</span>
+      </p>
+    </div>
+
+    <!-- Draft content (shown after loading) -->
+    <div id="draftContent" class="hidden">
+      <div id="step3Alert" class="alert hidden"></div>
+
+      <!-- Department / PIO Card -->
+      <h3 style="color:var(--blue);font-size:1rem;margin-bottom:0.75rem" data-i18n="dept_title">📍 Department & PIO Details</h3>
+      <div id="pioCard" class="pio-card"></div>
+
+      <!-- Success Predictor -->
+      <div class="card" style="margin-top:1.5rem;border:2px solid var(--blue-bg)">
+        <h3 style="color:var(--blue);font-size:1rem;margin-bottom:0.75rem">🎯 AI Success Predictor</h3>
+        <div id="predictorWidget"></div>
+      </div>
+
+      <!-- RTI Application Preview -->
+      <h3 style="color:var(--blue);font-size:1rem;margin:1.5rem 0 0.75rem" data-i18n="preview_title">📄 RTI Application Preview</h3>
+      <pre class="rti-preview" id="rtiPreview"></pre>
+
+      <div class="wizard-actions">
+        <button class="btn btn-outline" id="backStep3Btn" type="button">← Back</button>
+        <button class="btn btn-primary" id="nextStep3Btn" type="button">Looks Good → Proceed to File</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 4: Confirm & File ══════════════════════════════ -->
+  <div class="step-panel card" data-step="4">
+    <h2 style="color:var(--blue);font-size:1.3rem;margin-bottom:0.3rem">Step 4: Confirm and File RTI</h2>
+    <p style="color:var(--gray);margin-bottom:1.5rem;font-size:0.95rem">Please review the summary before submitting.</p>
+
+    <div style="background:var(--blue-bg);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.5rem">
+      <table style="width:100%;font-size:0.95rem">
+        <tr><td style="padding:0.5rem;color:var(--gray);width:40%">Reference No. (Preview)</td><td style="padding:0.5rem;font-weight:700;color:var(--blue)" id="confirmRefNumber"></td></tr>
+        <tr><td style="padding:0.5rem;color:var(--gray)">Department</td><td style="padding:0.5rem" id="confirmDept"></td></tr>
+        <tr><td style="padding:0.5rem;color:var(--gray)">Response Deadline</td><td style="padding:0.5rem;font-weight:600;color:var(--green)" id="confirmDeadline"></td></tr>
+        <tr><td style="padding:0.5rem;color:var(--gray)">Filing Fee</td><td style="padding:0.5rem" id="confirmFee"></td></tr>
+        <tr><td style="padding:0.5rem;color:var(--gray)">RTI Portal</td><td style="padding:0.5rem"><a href="https://rtionline.gov.in" target="_blank">rtionline.gov.in</a></td></tr>
+      </table>
+    </div>
+
+    <div class="alert alert-info" style="font-size:0.9rem">
+      ℹ️ By clicking "File RTI Now", your application will be submitted to the concerned government department.
+      You will receive a reference number and can download a PDF copy.
+    </div>
+
+    <div class="wizard-actions">
+      <button class="btn btn-outline" id="backStep4Btn" type="button">← Back to Review</button>
+      <button class="btn btn-saffron btn-lg" id="confirmFileBtn" type="button" data-i18n="file_btn">🚀 File RTI Now</button>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 5: Success ════════════════════════════════════ -->
+  <div class="step-panel card" data-step="5">
+    <div class="success-card">
+      <div class="success-icon">🎉</div>
+      <h2 style="font-size:1.6rem;color:var(--blue);font-weight:800" data-i18n="success_title">RTI Filed Successfully!</h2>
+      <p style="color:var(--gray);margin-top:0.5rem" data-i18n="success_msg">Your RTI has been submitted. Response expected within 30 days.</p>
+
+      <div style="margin:1.5rem 0">
+        <div style="font-size:0.85rem;color:var(--gray);margin-bottom:0.4rem" data-i18n="ref_label">Reference Number</div>
+        <div class="ref-number-display" id="successRefNumber"></div>
+      </div>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot done"></div>
+          <div><strong>RTI Filed</strong><div style="color:var(--gray);font-size:0.85rem">Today — Application submitted to <span id="successDept"></span></div></div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot pending"></div>
+          <div><strong>Acknowledgment</strong><div style="color:var(--gray);font-size:0.85rem">Expected within 2-3 working days</div></div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot pending"></div>
+          <div><strong>Response Deadline</strong><div style="color:var(--gray);font-size:0.85rem"><span id="successDeadline"></span> — 30 days from filing</div></div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot pending"></div>
+          <div><strong>Auto Appeal</strong><div style="color:var(--gray);font-size:0.85rem">First Appeal generated automatically if no response received</div></div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:1rem;justify-content:center;margin-top:2rem;flex-wrap:wrap">
+        <button class="btn btn-primary btn-lg" id="downloadPdfBtn" type="button" data-i18n="download_pdf">⬇️ Download PDF</button>
+        <button class="btn btn-outline btn-lg" id="trackRtiBtn" type="button" data-i18n="track_another">🔍 Track Status</button>
+        <button class="btn btn-saffron" id="fileNewBtn" type="button">📝 File Another RTI</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="js/wizard.js"></script>
+</body>
+</html>

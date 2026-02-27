@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RTI-Saarthi — AI-Powered RTI Filing Agent</title>
+  <meta name="description" content="File RTI applications in minutes with AI assistance. Supports Hindi and English. Free for BPL citizens."/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇮🇳</text></svg>"/>
+  <link rel="stylesheet" href="css/main.css"/>
+</head>
+<body>
+
+<!-- ── Navbar ──────────────────────────────────────── -->
+<nav class="navbar">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">
+      <span class="flag">🇮🇳</span>
+      RTI-<span class="saarthi">Saarthi</span>
+    </a>
+    <div class="navbar-links">
+      <a href="index.html" class="active" data-i18n="nav_home">Home</a>
+      <a href="file-rti.html" data-i18n="nav_file">File RTI</a>
+      <a href="dashboard.html" data-i18n="nav_track">Track</a>
+      <a href="#about" data-i18n="nav_about">About</a>
+      <select class="lang-select" id="langSelect">
+        <option value="en">🇬🇧 English</option>
+        <option value="hi">🇮🇳 हिंदी</option>
+      </select>
+      <a href="file-rti.html" class="btn btn-saffron btn-sm">File RTI</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Hero ─────────────────────────────────────────── -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">🤖 Powered by Claude AI &nbsp;|&nbsp; 🇮🇳 RTI Act 2005</div>
+    <h1 class="hero-title" data-i18n="hero_title">Your Right.<br/><span class="highlight">Your Voice.</span></h1>
+    <p class="hero-subtitle" data-i18n="hero_subtitle">
+      AI-powered RTI filing in minutes. Ask in Hindi or English.
+      We handle the legal complexity — you get the answers.
+    </p>
+    <div class="hero-cta">
+      <a href="file-rti.html" class="btn btn-saffron btn-lg" data-i18n="btn_file">📝 File RTI Now</a>
+      <a href="dashboard.html" class="btn btn-outline btn-lg" style="color:white;border-color:rgba(255,255,255,0.5)" data-i18n="btn_track">🔍 Track My RTI</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num counter" data-target="600000" data-suffix="+" id="statTotal">0</div><div class="label">RTIs Filed/Year (Goal)</div></div>
+      <div class="hero-stat"><div class="num counter" data-target="28" data-suffix="+" id="statStates">0</div><div class="label">States Covered</div></div>
+      <div class="hero-stat"><div class="num counter" data-target="500" data-suffix="+">0</div><div class="label">Departments Mapped</div></div>
+      <div class="hero-stat"><div class="num counter" data-target="50" data-suffix="hrs">0</div><div class="label">Hours Saved per RTI</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Problem Statement ──────────────────────────── -->
+<section style="padding:4rem 0;background:white">
+  <div class="container text-center">
+    <h2 class="section-title">Why RTI-Saarthi?</h2>
+    <p class="section-subtitle">Only 6 lakh RTIs filed per year — against 10+ crore citizens who need information.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-top:2rem">
+      <div class="card" style="border-top:4px solid #ef4444">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem">😤</div>
+        <h3 style="color:var(--blue);margin-bottom:0.5rem">Complexity Barrier</h3>
+        <p style="color:var(--gray);font-size:0.95rem">85% of citizens don't know how to file RTI — confusing formats, legal jargon</p>
+      </div>
+      <div class="card" style="border-top:4px solid var(--saffron)">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem">🌐</div>
+        <h3 style="color:var(--blue);margin-bottom:0.5rem">Language Barrier</h3>
+        <p style="color:var(--gray);font-size:0.95rem">Most forms only in English — rural citizens excluded from their own rights</p>
+      </div>
+      <div class="card" style="border-top:4px solid var(--blue-lt)">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem">⏱️</div>
+        <h3 style="color:var(--blue);margin-bottom:0.5rem">Time Wastage</h3>
+        <p style="color:var(--gray);font-size:0.95rem">Citizens spend 5–7 days drafting, submitting, and tracking a single RTI</p>
+      </div>
+      <div class="card" style="border-top:4px solid var(--green)">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem">🔍</div>
+        <h3 style="color:var(--blue);margin-bottom:0.5rem">Corruption Enabler</h3>
+        <p style="color:var(--gray);font-size:0.95rem">Complex RTI process allows officials to avoid accountability with impunity</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Features ──────────────────────────────────── -->
+<section class="features">
+  <div class="container text-center">
+    <h2 class="section-title">5 AI Agents Working For You</h2>
+    <p class="section-subtitle">End-to-end automation from your question to a government response.</p>
+    <div class="features-grid">
+      <div class="card feature-card card-hover">
+        <div class="feature-icon">🧠</div>
+        <h3>Agent 1: Query Understanding</h3>
+        <p>Understands your question in Hindi or English. Extracts what you need, from which department, for what period.</p>
+      </div>
+      <div class="card feature-card card-hover">
+        <div class="feature-icon">🗺️</div>
+        <h3>Agent 2: Smart Routing</h3>
+        <p>Automatically identifies the correct PIO from 500+ mapped departments across all 28 states and central ministries.</p>
+      </div>
+      <div class="card feature-card card-hover">
+        <div class="feature-icon">📜</div>
+        <h3>Agent 3: Legal Drafting</h3>
+        <p>Generates a legally valid RTI application under the RTI Act 2005 with all mandatory sections and proper legal language.</p>
+      </div>
+      <div class="card feature-card card-hover">
+        <div class="feature-icon">📤</div>
+        <h3>Agent 4: Auto Filing</h3>
+        <p>Submits to the correct government portal, generates a reference number, and sets 30-day deadline reminders automatically.</p>
+      </div>
+      <div class="card feature-card card-hover">
+        <div class="feature-icon">⚖️</div>
+        <h3>Agent 5: Auto Appeals</h3>
+        <p>Monitors response deadlines. If no response in 30 days, automatically generates a First Appeal under Section 19(1).</p>
+      </div>
+      <div class="card feature-card card-hover">
+        <div class="feature-icon">🎤</div>
+        <h3>Voice Input (Hindi)</h3>
+        <p>Just speak your question in Hindi or English. No typing needed. Perfect for rural citizens and first-time users.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── How It Works ───────────────────────────────── -->
+<section class="how-it-works" id="how">
+  <div class="container text-center">
+    <h2 class="section-title">How It Works</h2>
+    <p class="section-subtitle">From your question to a government answer in 5 simple steps.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Ask Your Question</h3>
+          <p>Type or speak your question in Hindi or English. e.g. "मेरी सड़क कब बनेगी?" or "When will my road be repaired?"</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>AI Finds the Right Department</h3>
+          <p>Claude AI automatically identifies the correct government department and PIO responsible for your query.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Legal RTI is Drafted</h3>
+          <p>A complete, legally compliant RTI application is generated under RTI Act 2005. You review and approve it.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h3>Auto Filed to Government Portal</h3>
+          <p>RTI is submitted to the correct portal. You get a reference number and PDF copy instantly.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h3>Track & Get Appeals Auto-Filed</h3>
+          <p>Track status in real-time. If no response in 30 days, First Appeal is generated automatically.</p>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:3rem">
+      <a href="file-rti.html" class="btn btn-primary btn-lg">Start Filing Now — It's Free →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA Banner ─────────────────────────────────── -->
+<section style="background:linear-gradient(135deg,var(--saffron),#e8871e);padding:4rem 0;text-align:center;color:white">
+  <div class="container">
+    <h2 style="font-size:2rem;font-weight:800;margin-bottom:0.75rem">RTI is your most powerful right.</h2>
+    <p style="font-size:1.1rem;opacity:0.9;margin-bottom:2rem">99% of citizens can't use it. RTI-Saarthi changes that.</p>
+    <a href="file-rti.html" class="btn btn-lg" style="background:white;color:var(--saffron);font-weight:700">📝 File Your First RTI Free</a>
+  </div>
+</section>
+
+<!-- ── About ──────────────────────────────────────── -->
+<section id="about" style="padding:4rem 0;background:var(--gray-lt)">
+  <div class="container text-center">
+    <h2 class="section-title">About RTI-Saarthi</h2>
+    <p style="max-width:650px;margin:0 auto;color:var(--gray);font-size:1rem;line-height:1.8">
+      RTI-Saarthi was built for the hackathon to democratize India's Right to Information Act.
+      We use Claude Sonnet AI for multi-agent orchestration, FastAPI backend, and a simple
+      HTML/CSS/JS frontend to ensure it works even on low-end devices.
+      Aligned with: <strong>Digital India | Corruption Reduction | Rural Empowerment</strong>
+    </p>
+    <div style="margin-top:2rem;display:flex;justify-content:center;gap:1rem;flex-wrap:wrap">
+      <span style="display:inline-flex;background:var(--blue-bg);color:var(--blue);border-radius:50px;padding:0.4rem 1rem;font-size:0.9rem;font-weight:600">🤖 Claude Sonnet API</span>
+      <span style="display:inline-flex;background:var(--blue-bg);color:var(--blue);border-radius:50px;padding:0.4rem 1rem;font-size:0.9rem;font-weight:600">⚡ FastAPI</span>
+      <span style="display:inline-flex;background:var(--blue-bg);color:var(--blue);border-radius:50px;padding:0.4rem 1rem;font-size:0.9rem;font-weight:600">🌐 12+ Indian Languages</span>
+      <span style="display:inline-flex;background:var(--blue-bg);color:var(--blue);border-radius:50px;padding:0.4rem 1rem;font-size:0.9rem;font-weight:600">📱 Works on Any Device</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ─────────────────────────────────────── -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">RTI-<span>Saarthi</span></div>
+        <p style="font-size:0.9rem;opacity:0.8;line-height:1.7">Democratizing Transparency.<br/>Empowering Every Citizen.</p>
+      </div>
+      <div>
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="file-rti.html">File RTI</a></li>
+          <li><a href="dashboard.html">Track RTI</a></li>
+          <li><a href="#how">How It Works</a></li>
+          <li><a href="#about">About</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="https://rtionline.gov.in" target="_blank">RTI Online Portal</a></li>
+          <li><a href="https://rti.india.gov.in" target="_blank">RTI India</a></li>
+          <li><a href="#">RTI Act 2005 (PDF)</a></li>
+          <li><a href="#">User Guide</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Tech Stack</h4>
+        <ul>
+          <li><a href="#">Claude Sonnet API</a></li>
+          <li><a href="#">FastAPI Backend</a></li>
+          <li><a href="#">Bhashini (Translation)</a></li>
+          <li><a href="#">ReportLab (PDF)</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2024 RTI-Saarthi | Built for Hackathon | Aligned with Digital India Mission</p>
+      <p style="margin-top:0.3rem">🇮🇳 Jai Hind | Powered by Claude AI</p>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard — RTI-Saarthi</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>"/>
+  <link rel="stylesheet" href="css/main.css"/>
+  <link rel="stylesheet" href="css/dashboard.css"/>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="container">
+    <a class="navbar-brand" href="index.html"><span class="flag">🇮🇳</span>RTI-<span class="saarthi">Saarthi</span></a>
+    <div class="navbar-links">
+      <a href="index.html">Home</a>
+      <a href="file-rti.html">File RTI</a>
+      <a href="dashboard.html" class="active">Track</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Dashboard Hero -->
+<div class="dashboard-hero">
+  <div class="container">
+    <h1>📊 RTI Tracking Dashboard</h1>
+    <p>Monitor your RTI applications, deadlines, and appeals in real-time.</p>
+  </div>
+</div>
+
+<div class="container" style="padding-top:2rem;padding-bottom:4rem">
+
+  <!-- Stats Row -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon blue">📋</div>
+      <div><div class="stat-num" id="statTotalRtis">—</div><div class="stat-label">Total RTIs Filed</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">✅</div>
+      <div><div class="stat-num" id="statResponseRate">—</div><div class="stat-label">Response Rate</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon orange">🗺️</div>
+      <div><div class="stat-num" id="statStates">—</div><div class="stat-label">States Covered</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon purple">⚡</div>
+      <div><div class="stat-num" id="statAvgDays">—</div><div class="stat-label">Avg. Response Days</div></div>
+    </div>
+  </div>
+
+  <!-- Track by Ref Number -->
+  <div class="card" style="margin-bottom:2rem">
+    <h2 style="color:var(--blue);font-size:1.1rem;margin-bottom:1rem">🔍 Track RTI by Reference Number</h2>
+    <div class="track-form" id="trackForm">
+      <input type="text" id="trackInput" placeholder="Enter Reference No. e.g. RTI2024-00001" style="text-transform:uppercase"/>
+      <button class="btn btn-primary" id="trackSubmitBtn" type="button">Track</button>
+    </div>
+  </div>
+
+  <!-- Appeal Container -->
+  <div id="appealContainer" class="hidden" style="margin-bottom:1.5rem"></div>
+
+  <!-- RTIs Table -->
+  <div class="rtis-table-wrap">
+    <div class="rtis-table-header">
+      <h2>Recent RTI Applications (Demo Data)</h2>
+      <a href="file-rti.html" class="btn btn-saffron btn-sm">+ File New RTI</a>
+    </div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Reference No.</th>
+            <th>Subject</th>
+            <th>Department</th>
+            <th>Status</th>
+            <th>Filed</th>
+            <th>Deadline</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="rtiTableBody">
+          <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--gray)">
+            <div class="spinner" style="margin:0 auto 1rem"></div>Loading RTI data...
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Info Banner -->
+  <div class="alert alert-info" style="margin-top:2rem">
+    ℹ️ <strong>Demo Mode:</strong> Showing sample data. To see real RTIs, make sure the backend is running on
+    <code>http://localhost:8000</code> and file an RTI using the
+    <a href="file-rti.html">File RTI wizard</a>.
+  </div>
+</div>
+
+<!-- RTI Detail Modal -->
+<div class="modal-overlay hidden" id="detailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>RTI Details — <span id="modalRefNumber"></span></h2>
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <div class="spinner"></div>
+    </div>
+  </div>
+</div>
+
+<footer style="background:var(--blue);color:rgba(255,255,255,0.7);padding:1.5rem 0;text-align:center;font-size:0.9rem;margin-top:0">
+  RTI-Saarthi © 2024 | Built for Hackathon | Powered by Claude AI 🇮🇳
+</footer>
+
+<script type="module" src="js/dashboard.js"></script>
+</body>
+</html>

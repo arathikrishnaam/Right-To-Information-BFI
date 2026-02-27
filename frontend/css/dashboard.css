@@ -1,0 +1,160 @@
+.dashboard-hero {
+  background: linear-gradient(135deg, var(--blue) 0%, #2d6ca2 100%);
+  color: white; padding: 2.5rem 0;
+}
+.dashboard-hero h1 { font-size: 1.8rem; font-weight: 800; }
+.dashboard-hero p { opacity: 0.85; margin-top: 0.4rem; }
+
+/* ── Stat Cards ──────────────────────────────────────────── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.25rem; margin: 2rem 0;
+}
+.stat-card {
+  background: white; border-radius: var(--radius);
+  padding: 1.25rem 1.5rem; box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; gap: 1rem;
+}
+.stat-icon {
+  width: 52px; height: 52px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; flex-shrink: 0;
+}
+.stat-icon.blue { background: var(--blue-bg); }
+.stat-icon.green { background: #d1fae5; }
+.stat-icon.orange { background: #fff7ed; }
+.stat-icon.purple { background: #f3e8ff; }
+.stat-num { font-size: 1.8rem; font-weight: 800; color: var(--blue); }
+.stat-label { font-size: 0.85rem; color: var(--gray); margin-top: 0.2rem; }
+
+/* ── Track Form ──────────────────────────────────────────── */
+.track-form {
+  display: flex; gap: 0.75rem; max-width: 600px; margin: 0 auto 2rem;
+}
+.track-form input {
+  flex: 1; padding: 0.9rem 1.2rem;
+  border: 2px solid var(--border); border-radius: 10px;
+  font-size: 1rem;
+}
+.track-form input:focus {
+  outline: none; border-color: var(--blue-lt);
+  box-shadow: 0 0 0 3px rgba(45,108,162,0.15);
+}
+
+/* ── RTI List Table ─────────────────────────────────────── */
+.rtis-table-wrap {
+  background: white; border-radius: var(--radius);
+  box-shadow: var(--shadow); overflow: hidden;
+  border: 1px solid var(--border);
+}
+.rtis-table-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border);
+}
+.rtis-table-header h2 { font-size: 1.1rem; font-weight: 700; color: var(--blue); }
+table { width: 100%; border-collapse: collapse; }
+th {
+  background: var(--gray-lt); padding: 0.75rem 1rem;
+  text-align: left; font-size: 0.8rem; font-weight: 700;
+  color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em;
+}
+td { padding: 1rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--blue-bg); }
+
+/* ── Status Badges ───────────────────────────────────────── */
+.badge {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  padding: 0.3rem 0.8rem; border-radius: 50px;
+  font-size: 0.78rem; font-weight: 600;
+}
+.badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.badge-filed    { background: #fff7ed; color: #c2410c; }
+.badge-acknowledged { background: #eff6ff; color: #1d4ed8; }
+.badge-processing { background: #f3e8ff; color: #7e22ce; }
+.badge-responded  { background: #d1fae5; color: #065f46; }
+.badge-appeal     { background: #fee2e2; color: #991b1b; }
+
+/* ── Timeline Tracker ────────────────────────────────────── */
+.status-timeline {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 1.5rem 0; position: relative;
+}
+.status-timeline::before {
+  content: ''; position: absolute; top: 21px; left: 8%; right: 8%;
+  height: 3px; background: var(--border);
+}
+.status-node {
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  z-index: 1; flex: 1;
+}
+.status-dot {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: white; border: 3px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+}
+.status-node.done .status-dot { background: var(--green); border-color: var(--green); }
+.status-node.active .status-dot { background: var(--blue-bg); border-color: var(--blue); animation: pulse 2s infinite; }
+.status-node-label { font-size: 0.75rem; text-align: center; color: var(--gray); max-width: 80px; }
+.status-node.done .status-node-label { color: var(--green); font-weight: 600; }
+.status-node.active .status-node-label { color: var(--blue); font-weight: 600; }
+
+/* ── Detail Modal ────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  z-index: 200; display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+}
+.modal {
+  background: white; border-radius: 16px;
+  max-width: 700px; width: 100%;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.modal-header {
+  padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  position: sticky; top: 0; background: white; z-index: 1;
+}
+.modal-header h2 { font-size: 1.1rem; font-weight: 700; color: var(--blue); }
+.modal-close {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--gray-lt); border: none;
+  cursor: pointer; font-size: 1.2rem; display: flex;
+  align-items: center; justify-content: center;
+}
+.modal-body { padding: 1.5rem; }
+
+/* ── Appeal Banner ─────────────────────────────────────────── */
+.appeal-banner {
+  background: #fee2e2; border: 1px solid #fca5a5;
+  border-radius: var(--radius); padding: 1.25rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.appeal-banner .icon { font-size: 2rem; flex-shrink: 0; }
+.appeal-banner h3 { font-size: 1rem; font-weight: 700; color: #991b1b; }
+.appeal-banner p { font-size: 0.9rem; color: #b91c1c; margin-top: 0.2rem; }
+
+/* ── Deadline Progress ─────────────────────────────────────── */
+.deadline-bar-wrap { margin: 1rem 0; }
+.deadline-bar-track {
+  height: 8px; background: var(--border);
+  border-radius: 4px; overflow: hidden;
+}
+.deadline-bar-fill {
+  height: 100%; border-radius: 4px;
+  transition: width 1s ease;
+}
+.deadline-bar-fill.safe { background: var(--green); }
+.deadline-bar-fill.warn { background: var(--saffron); }
+.deadline-bar-fill.danger { background: #ef4444; }
+
+@media (max-width: 768px) {
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .track-form { flex-direction: column; }
+  table { font-size: 0.8rem; }
+  td, th { padding: 0.6rem 0.5rem; }
+}
