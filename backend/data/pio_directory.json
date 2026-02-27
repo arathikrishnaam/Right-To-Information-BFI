@@ -1,0 +1,140 @@
+{
+  "central": [
+    {
+      "id": "C001",
+      "department": "Ministry of Railways",
+      "pio_name": "Sh. Rajiv Kumar",
+      "designation": "Public Information Officer",
+      "email": "pio.railways@gov.in",
+      "phone": "011-23384010",
+      "address": "Rail Bhavan, Raisina Road, New Delhi - 110001",
+      "portal": "https://rtionline.gov.in",
+      "categories": ["train delay", "railway ticket", "reservation", "railway employee", "railway tender", "station development"]
+    },
+    {
+      "id": "C002",
+      "department": "Ministry of Health and Family Welfare",
+      "pio_name": "Dr. Anita Sharma",
+      "designation": "Public Information Officer",
+      "email": "pio.mohfw@gov.in",
+      "phone": "011-23061703",
+      "address": "Nirman Bhavan, New Delhi - 110011",
+      "portal": "https://rtionline.gov.in",
+      "categories": ["hospital", "medicine", "AIIMS", "health scheme", "PMJAY", "doctor", "nurse"]
+    },
+    {
+      "id": "C003",
+      "department": "Ministry of Education",
+      "pio_name": "Sh. Pradeep Gupta",
+      "designation": "Public Information Officer",
+      "email": "pio.education@gov.in",
+      "phone": "011-23782698",
+      "address": "Shastri Bhavan, New Delhi - 110001",
+      "portal": "https://rtionline.gov.in",
+      "categories": ["school", "college", "university", "scholarship", "mid day meal", "RTE", "CBSE", "teacher"]
+    },
+    {
+      "id": "C004",
+      "department": "Ministry of Road Transport and Highways",
+      "pio_name": "Sh. Suresh Patel",
+      "designation": "Public Information Officer",
+      "email": "pio.morth@gov.in",
+      "phone": "011-23717203",
+      "address": "Transport Bhavan, 1 Parliament Street, New Delhi - 110001",
+      "portal": "https://rtionline.gov.in",
+      "categories": ["highway", "road", "bridge", "toll", "NHAI", "national highway", "accident"]
+    },
+    {
+      "id": "C005",
+      "department": "Department of Posts",
+      "pio_name": "Sh. Mohan Singh",
+      "designation": "Public Information Officer",
+      "email": "pio.indiapost@gov.in",
+      "phone": "011-23096000",
+      "address": "Dak Bhavan, Sansad Marg, New Delhi - 110116",
+      "portal": "https://rtionline.gov.in",
+      "categories": ["post office", "speed post", "money order", "postal", "parcel", "postman"]
+    },
+    {
+      "id": "C006",
+      "department": "Ministry of Finance - Income Tax",
+      "pio_name": "CA Ramesh Joshi",
+      "designation": "Public Information Officer",
+      "email": "pio.incometax@gov.in",
+      "phone": "011-23379924",
+      "address": "North Block, New Delhi - 110001",
+      "portal": "https://rtionline.gov.in",
+      "categories": ["income tax", "ITR", "TDS", "refund", "PAN", "tax department"]
+    },
+    {
+      "id": "C007",
+      "department": "EPFO - Employees Provident Fund",
+      "pio_name": "Sh. Vikram Nair",
+      "designation": "Public Information Officer",
+      "email": "pio.epfo@gov.in",
+      "phone": "011-26172671",
+      "address": "Bhavishya Nidhi Bhawan, 14 Bhikaiji Cama Place, New Delhi - 110066",
+      "portal": "https://rtionline.gov.in",
+      "categories": ["PF", "provident fund", "EPF", "pension", "employee", "UAN", "withdrawal"]
+    },
+    {
+      "id": "C008",
+      "department": "Ministry of Petroleum and Natural Gas",
+      "pio_name": "Sh. Dinesh Chandra",
+      "designation": "Public Information Officer",
+      "email": "pio.petroleum@gov.in",
+      "phone": "011-23384522",
+      "address": "Shastri Bhavan, New Delhi - 110001",
+      "portal": "https://rtionline.gov.in",
+      "categories": ["LPG", "gas cylinder", "petrol pump", "oil", "subsidy", "cooking gas", "kerosene"]
+    },
+    {
+      "id": "C009",
+      "department": "Department of Food and Public Distribution",
+      "pio_name": "Sh. Arun Mehta",
+      "designation": "Public Information Officer",
+      "email": "pio.dfpd@gov.in",
+      "phone": "011-23070637",
+      "address": "Krishi Bhavan, New Delhi - 110001",
+      "portal": "https://rtionline.gov.in",
+      "categories": ["ration card", "PDS", "food grain", "wheat", "rice", "BPL", "APL", "fair price shop", "ration"]
+    },
+    {
+      "id": "C010",
+      "department": "Ministry of Housing and Urban Affairs",
+      "pio_name": "Sh. Hemant Rao",
+      "designation": "Public Information Officer",
+      "email": "pio.mohua@gov.in",
+      "phone": "011-23060484",
+      "address": "Nirman Bhavan, New Delhi - 110011",
+      "portal": "https://rtionline.gov.in",
+      "categories": ["PM Awas Yojana", "housing", "flat", "DDA", "urban development", "smart city", "municipal", "slum"]
+    }
+  ],
+  "state": {
+    "Maharashtra": [
+      {
+        "id": "MH001",
+        "department": "PWD Maharashtra",
+        "pio_name": "Sh. Govind Patil",
+        "designation": "State PIO",
+        "email": "pio.pwd.mh@maharashtra.gov.in",
+        "phone": "022-22025111",
+        "address": "PWD Bhavan, Mumbai - 400032",
+        "portal": "https://aaplesarkar.mahaonline.gov.in",
+        "categories": ["road", "bridge", "building", "construction", "tender", "Maharashtra road"]
+      },
+      {
+        "id": "MH002",
+        "department": "BMC - Municipal Corporation",
+        "pio_name": "Sh. Prakash Kale",
+        "designation": "State PIO",
+        "email": "pio.bmc@mcgm.gov.in",
+        "phone": "022-24132222",
+        "address": "Municipal Head Office, CST Road, Mumbai - 400001",
+        "portal": "https://aaplesarkar.mahaonline.gov.in",
+        "categories": ["Mumbai", "BMC", "water", "drainage", "garbage", "pothole", "property tax", "Mumbai municipality"]
+      }
+    ]
+  }
+}

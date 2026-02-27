@@ -1,0 +1,40 @@
+{
+  "application_header": "APPLICATION UNDER THE RIGHT TO INFORMATION ACT, 2005",
+  "sections": {
+    "to_address": "To,\nThe Public Information Officer,\n{department_name},\n{department_address}",
+    "subject": "Subject: Request for Information under Section 6 of the Right to Information Act, 2005",
+    "applicant_info": "I, {applicant_name}, resident of {applicant_address}, hereby request the following information under the Right to Information Act, 2005:",
+    "bpl_clause": "I am a Below Poverty Line (BPL) cardholder (BPL Card No: {bpl_card_no}) and am therefore exempt from paying the application fee as per Section 7(5) of the RTI Act, 2005.",
+    "fee_clause": "I am enclosing an application fee of Rs. 10/- (Rupees Ten Only) as required under the RTI Act, 2005.",
+    "information_sought": "INFORMATION SOUGHT:\n\n{questions_list}",
+    "time_period": "The information sought pertains to the period: {time_period}",
+    "closing": "I request that the above information be provided to me within 30 days as stipulated under Section 7(1) of the Right to Information Act, 2005.\n\nIf the information requested is not available with your office, I request that the application be transferred to the concerned Public Authority under Section 6(3) of the RTI Act, 2005.",
+    "declaration": "I hereby declare that I am a citizen of India.",
+    "signature_block": "Yours faithfully,\n\n{applicant_name}\nDate: {date}\nAddress: {applicant_address}\nMobile: {mobile}\nEmail: {email}"
+  },
+  "first_appeal_template": {
+    "subject": "FIRST APPEAL UNDER SECTION 19(1) OF THE RIGHT TO INFORMATION ACT, 2005",
+    "body": "To,\nThe First Appellate Authority,\n{department_name},\n{department_address}\n\nSub: First Appeal against non-receipt of information under RTI Act, 2005\n\nI, {applicant_name}, had filed an RTI application dated {rti_date} (Registration No: {ref_number}) with your office seeking information about {subject}. However, I have not received any response within the stipulated period of 30 days as required under Section 7(1) of the RTI Act, 2005.\n\nI hereby file this First Appeal under Section 19(1) of the RTI Act, 2005, requesting that:\n1. The PIO be directed to provide the requested information immediately.\n2. Action be taken against the PIO for failure to respond within the stipulated time.\n\nDate: {appeal_date}\n{applicant_name}\n{applicant_address}"
+  },
+  "question_starters": {
+    "general": [
+      "Please provide the complete details of",
+      "Please furnish certified copies of all documents related to",
+      "Please provide information regarding the current status of",
+      "Please provide the names and designations of officials responsible for"
+    ],
+    "financial": [
+      "Please provide the sanctioned budget and expenditure for",
+      "Please furnish the details of tenders floated for",
+      "Please provide the names of contractors/vendors awarded contracts for"
+    ],
+    "timeline": [
+      "Please provide the expected completion date of",
+      "Please provide the reasons for delay in"
+    ],
+    "personnel": [
+      "Please provide the total number of staff employed in",
+      "Please provide the qualification and appointment date of"
+    ]
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "categories": {
+    "road_infrastructure": {
+      "keywords": ["road","sarak","sadak","highway","bridge","pul","pothole","gadda","construction","nirman","footpath","divider","flyover"],
+      "departments": ["PWD","NHAI","Municipal Corporation","BDA","BBMP"],
+      "central_pio_id": "C004",
+      "acts": ["Section 2(f) RTI Act 2005", "Section 4(1)(b) RTI Act 2005"]
+    },
+    "food_ration": {
+      "keywords": ["ration","ration card","PDS","food grain","wheat","rice","aata","chawal","anaj","BPL","APL","fair price","ucit muly","subsidy"],
+      "departments": ["Department of Food and Public Distribution","State Food Department"],
+      "central_pio_id": "C009",
+      "acts": ["Section 2(f) RTI Act 2005","National Food Security Act 2013"]
+    },
+    "electricity": {
+      "keywords": ["electricity","bijli","power","current","meter","bill","transformer","load shedding","cut","wiring","connection"],
+      "departments": ["State Electricity Board","DISCOMS","Power Corporation"],
+      "central_pio_id": null,
+      "acts": ["Section 2(f) RTI Act 2005","Electricity Act 2003"]
+    },
+    "water": {
+      "keywords": ["water","paani","jal","pipeline","supply","sewage","drain","naali","tanker","connection","leakage"],
+      "departments": ["Jal Board","Municipal Water Department","PWD Water Wing"],
+      "central_pio_id": null,
+      "acts": ["Section 2(f) RTI Act 2005"]
+    },
+    "education": {
+      "keywords": ["school","college","university","teacher","scholarship","mid day meal","RTE","admission","fee","result","exam","CBSE","syllabus"],
+      "departments": ["Ministry of Education","State Education Department","District Education Office"],
+      "central_pio_id": "C003",
+      "acts": ["Section 2(f) RTI Act 2005","Right to Education Act 2009"]
+    },
+    "health": {
+      "keywords": ["hospital","doctor","medicine","treatment","ambulance","health","AIIMS","PHC","dispensary","nurse","surgery","PMJAY","Ayushman"],
+      "departments": ["Ministry of Health","State Health Department","District Hospital"],
+      "central_pio_id": "C002",
+      "acts": ["Section 2(f) RTI Act 2005"]
+    },
+    "employment": {
+      "keywords": ["job","employment","MGNREGA","NREGA","work","wage","labour","rozgar","naukri","EPF","PF","provident","salary","pension"],
+      "departments": ["Ministry of Labour","EPFO","State Labour Department"],
+      "central_pio_id": "C007",
+      "acts": ["Section 2(f) RTI Act 2005","MGNREGA Act 2005"]
+    },
+    "housing": {
+      "keywords": ["house","flat","plot","PM Awas","housing","DDA","BDA","allotment","slum","jhuggi","construction permit","building plan"],
+      "departments": ["Ministry of Housing","DDA","BDA","Municipal Corporation","Housing Board"],
+      "central_pio_id": "C010",
+      "acts": ["Section 2(f) RTI Act 2005"]
+    },
+    "railways": {
+      "keywords": ["train","railway","ticket","reservation","IRCTC","station","platform","delay","refund","TTE","railway employee"],
+      "departments": ["Ministry of Railways","Zonal Railway","Divisional Railway Manager"],
+      "central_pio_id": "C001",
+      "acts": ["Section 2(f) RTI Act 2005"]
+    },
+    "income_tax": {
+      "keywords": ["income tax","ITR","refund","TDS","PAN","tax","assessment","notice","demand"],
+      "departments": ["Income Tax Department","CBDT"],
+      "central_pio_id": "C006",
+      "acts": ["Section 2(f) RTI Act 2005","Income Tax Act 1961"]
+    },
+    "lpg_petroleum": {
+      "keywords": ["LPG","gas","cylinder","subsidy","petrol","pump","kerosene","oil","connection","Ujjwala"],
+      "departments": ["Ministry of Petroleum","IOC","BPCL","HPCL","State FCS"],
+      "central_pio_id": "C008",
+      "acts": ["Section 2(f) RTI Act 2005"]
+    },
+    "postal": {
+      "keywords": ["post office","speed post","registered post","money order","parcel","delivery","postman","stamp"],
+      "departments": ["India Post","Department of Posts"],
+      "central_pio_id": "C005",
+      "acts": ["Section 2(f) RTI Act 2005"]
+    }
+  },
+  "states": [
+    "Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa",
+    "Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala",
+    "Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland",
+    "Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura",
+    "Uttar Pradesh","Uttarakhand","West Bengal","Delhi","Puducherry"
+  ],
+  "filing_fee": {
+    "general": 10,
+    "bpl": 0
+  },
+  "response_deadline_days": 30,
+  "first_appeal_deadline_days": 30,
+  "second_appeal_deadline_days": 90
+}
