@@ -2,24 +2,27 @@
 main.py — FastAPI Application Entry Point for RTI-Saarthi
 Run: uvicorn main:app --reload --port 8000
 """
-import os
 import json
+import os
 from datetime import datetime
 from typing import Optional
-from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse, JSONResponse
-from pydantic import BaseModel
+
 from dotenv import load_dotenv
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-# Load environment variables from .env file
 load_dotenv()
 
 # Internal imports
-from agents import QueryAgent, RoutingAgent, DraftingAgent, FilingAgent, AppealAgent
-from utils.database import init_db, get_db, RTIApplication, generate_ref_number
+from agents import (AppealAgent, DraftingAgent, FilingAgent, QueryAgent,
+                    RoutingAgent)
+from utils.database import RTIApplication, generate_ref_number, get_db, init_db
 from utils.pdf_generator import generate_rti_pdf
+
+print("Gemini Key:", os.getenv("GEMINI_API_KEY"))
 
 # ── Initialize FastAPI ────────────────────────────────────────
 app = FastAPI(
@@ -30,10 +33,10 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# ── CORS — allow frontend to call backend ─────────────────────
+# ── CORS ──────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production: specify your domain
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
@@ -53,8 +56,7 @@ filing_agent   = FilingAgent()
 appeal_agent   = AppealAgent()
 
 
-# ── Pydantic Models (Request Schemas) ────────────────────────
-
+# ── Pydantic Models ───────────────────────────────────────────
 class AnalyzeRequest(BaseModel):
     question: str
     language: Optional[str] = "en"
@@ -75,10 +77,8 @@ class CheckAppealRequest(BaseModel):
 
 
 # ── Routes ────────────────────────────────────────────────────
-
 @app.get("/")
 def root():
-    """Health check endpoint."""
     return {
         "app": "RTI-Saarthi",
         "version": "1.0.0",
@@ -90,27 +90,19 @@ def root():
 
 @app.post("/api/analyze")
 def analyze_question(req: AnalyzeRequest):
-    """
-    Agent 1: Analyze citizen's question and extract RTI intent.
-
-    Input:  Plain language question (Hindi/English)
-    Output: Structured intent, category, suggested questions
-    """
+    """Agent 1: Analyze citizen's question and extract RTI intent."""
     try:
         result = query_agent.analyze(req.question)
         return {"success": True, "data": result}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"analyze failed: {str(e)}")
 
 
 @app.post("/api/route")
 def route_department(req: AnalyzeRequest, state: str = "Delhi"):
-    """
-    Agent 2: Find the correct department and PIO.
-
-    Input:  Analyzed query + user state
-    Output: PIO details, department, filing portal URL
-    """
+    """Agent 2: Find the correct department and PIO."""
     try:
         query_result = query_agent.analyze(req.question)
         routing = routing_agent.route(query_result, state)
@@ -121,20 +113,11 @@ def route_department(req: AnalyzeRequest, state: str = "Delhi"):
 
 @app.post("/api/file-rti")
 def file_rti(req: RTIFilingRequest, db: Session = Depends(get_db)):
-    """
-    Main endpoint: Run all 5 agents and file RTI end-to-end.
-
-    Flow: Analyze → Route → Draft → File → Store in DB
-    Returns: Complete RTI with ref number, PDF ready
-    """
+    """Main endpoint: Run all 5 agents and file RTI end-to-end."""
     try:
-        # ── Agent 1: Analyze ──────────────────────────────────
         query_result = query_agent.analyze(req.question)
-
-        # ── Agent 2: Route ────────────────────────────────────
         routing = routing_agent.route(query_result, req.user_state)
 
-        # ── Agent 3: Draft ────────────────────────────────────
         applicant = {
             "name": req.applicant_name,
             "address": req.applicant_address,
@@ -144,17 +127,10 @@ def file_rti(req: RTIFilingRequest, db: Session = Depends(get_db)):
             "bpl_card_no": req.bpl_card_no
         }
         draft = drafting_agent.draft(query_result, routing, applicant)
-
-        # ── Generate Reference Number ─────────────────────────
         ref_number = generate_ref_number(db)
-
-        # ── Agent 4: File ─────────────────────────────────────
         filing_result = filing_agent.file(draft, routing, ref_number)
-
-        # ── Agent 5: Predict Success ──────────────────────────
         prediction = appeal_agent.predict_success(query_result, routing)
 
-        # ── Save to Database ──────────────────────────────────
         rti_record = RTIApplication(
             ref_number=ref_number,
             applicant_name=req.applicant_name,
@@ -179,7 +155,6 @@ def file_rti(req: RTIFilingRequest, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(rti_record)
 
-        # ── Return Complete Response ──────────────────────────
         return {
             "success": True,
             "ref_number": ref_number,
@@ -208,7 +183,6 @@ def file_rti(req: RTIFilingRequest, db: Session = Depends(get_db)):
 
 @app.get("/api/rti/{ref_number}")
 def get_rti(ref_number: str, db: Session = Depends(get_db)):
-    """Get RTI application details by reference number."""
     rti = db.query(RTIApplication).filter(RTIApplication.ref_number == ref_number).first()
     if not rti:
         raise HTTPException(status_code=404, detail="RTI not found")
@@ -229,7 +203,6 @@ def get_rti(ref_number: str, db: Session = Depends(get_db)):
 
 @app.get("/api/rti/{ref_number}/pdf")
 def download_pdf(ref_number: str, db: Session = Depends(get_db)):
-    """Generate and download RTI application as PDF."""
     rti = db.query(RTIApplication).filter(RTIApplication.ref_number == ref_number).first()
     if not rti:
         raise HTTPException(status_code=404, detail="RTI not found")
@@ -262,10 +235,8 @@ def download_pdf(ref_number: str, db: Session = Depends(get_db)):
 
 @app.get("/api/analytics")
 def get_analytics(db: Session = Depends(get_db)):
-    """Get analytics data for the dashboard."""
     total = db.query(RTIApplication).count()
     filed = db.query(RTIApplication).filter(RTIApplication.status == "filed").count()
-
     return {
         "success": True,
         "data": {
@@ -275,7 +246,7 @@ def get_analytics(db: Session = Depends(get_db)):
             "avg_response_days": 18,
             "states_covered": 28,
             "departments_mapped": 500,
-            "citizens_helped": total * 1,
+            "citizens_helped": total,
             "corruption_prevented_cr": round(total * 0.05, 2)
         }
     }
@@ -283,7 +254,6 @@ def get_analytics(db: Session = Depends(get_db)):
 
 @app.post("/api/check-appeal")
 def check_appeal(req: CheckAppealRequest, db: Session = Depends(get_db)):
-    """Agent 5: Check if appeal is needed for an RTI."""
     rti = db.query(RTIApplication).filter(RTIApplication.ref_number == req.ref_number).first()
     if not rti:
         raise HTTPException(status_code=404, detail="RTI not found")
@@ -304,7 +274,6 @@ def check_appeal(req: CheckAppealRequest, db: Session = Depends(get_db)):
 
 @app.get("/api/departments")
 def get_departments():
-    """Get list of all departments and PIOs (for autocomplete)."""
     from pathlib import Path
     data_dir = Path(__file__).parent / "data"
     with open(data_dir / "pio_directory.json") as f:
