@@ -1,4 +1,4 @@
-# 🇮🇳 RTI-Saarthi — AI-Powered RTI Filing Agent
+# RTI-Saarthi — AI-Powered RTI Filing Agent
 
 > **Democratizing Transparency. Empowering Every Citizen.**
 
@@ -6,7 +6,7 @@ RTI-Saarthi is a fully autonomous, multi-agent AI system that transforms a citiz
 
 ---
 
-## 🎯 The Problem
+##  The Problem
 
 India's RTI Act 2005 is one of the most powerful transparency laws in the world — yet over **85% of eligible citizens never file an RTI** because:
 
@@ -20,7 +20,7 @@ India's RTI Act 2005 is one of the most powerful transparency laws in the world 
 
 ---
 
-## 🤖 Autonomous Multi-Agent Architecture
+##  Autonomous Multi-Agent Architecture
 
 RTI-Saarthi is built as a **pipeline of 5 specialized AI agents**, each with a distinct role. Agents communicate through structured data contracts, reason independently at each step, and compose into a fully automated workflow requiring **zero human intervention** from question to filed application.
 
@@ -75,7 +75,7 @@ Citizen's Question (Hindi / English)
 
 ---
 
-## 🧠 How Each Agent Reasons
+##  How Each Agent Reasons
 
 ### Agent 1 — Query Understanding (`query_agent.py`)
 Uses Claude Sonnet with a strict system prompt to perform **multilingual intent extraction**. Given a raw Hindi/English complaint, it reasons about:
@@ -112,8 +112,6 @@ Runs on a scheduler. For each filed RTI, it computes `days_elapsed` since filing
 - **Day 25+**: Sends reminder notification
 - **Day 30+** (no response): Auto-generates First Appeal under Section 19(1), citing Section 7(1) violation and Section 18(1)(b)
 - **Success predictor**: Claude analyzes question clarity, department responsiveness history, and information availability to return a `success_probability` score with actionable tips
-
----
 
 
 ## 🗃️ Data Architecture
@@ -152,7 +150,7 @@ Every generated RTI application is compliant with:
 
 ---
 
-## 🌐 Multilingual Support
+## Multilingual Support
 
 RTI-Saarthi natively handles:
 - **Hindi** — full Devanagari understanding
@@ -160,8 +158,6 @@ RTI-Saarthi natively handles:
 - **Mixed / Hinglish** — common in citizen communication
 
 Claude translates and normalizes the query before processing, so every citizen regardless of language gets the same quality of legally precise output.
-
-
 
 ## 📊 Key Metrics & Impact
 
@@ -180,15 +176,61 @@ Claude translates and normalizes the query before processing, so every citizen r
 
 ---
 
-## 🔮 Production Roadmap
 
-- **Portal Automation** — Selenium/Playwright integration with `rtionline.gov.in` for real filing
-- **All 30 States** — Complete state PIO directory expansion
-- **WhatsApp Bot** — File RTIs via WhatsApp in Hindi
-- **Status Polling** — Automated portal scraping for live status updates
-- **Second Appeal** — Auto-generation for Central Information Commission
-- **Analytics Dashboard** — Department-wise RTI success rates
+## 📸 Screenshots
+
+### Step 1 — Your Query
+> Citizen types their complaint in plain English (or Hindi). Voice input supported. AI analyzes it instantly.
+
+![Step 1 - Your Query](screenshots/step1_query.jpeg)
 
 ---
 
+### Step 2 — Your Details
+> Applicant fills in name, mobile, email, and address. BPL card holders get automatic fee exemption.
+
+![Step 2 - Your Details](screenshots/step2_details.jpeg)
+
+---
+
+### Step 3 — Review Draft
+> AI has drafted the full RTI. PIO details, jurisdiction, filing fee, and portal URL are all auto-resolved.
+
+![Step 3 - Review Draft](screenshots/step3_review.jpeg)
+
+---
+
+### Step 4 — Confirm & File
+> Final summary before submission — reference number preview, department, response deadline, and RTI portal shown.
+
+![Step 4 - Confirm and File](screenshots/step4_confirm.jpeg)
+
+---
+
+### Step 5 — RTI Filed Successfully
+> Reference number `RTI2026-00014` generated. Application submitted to Department of Food and Public Distribution.
+
+![Step 5 - RTI Filed](screenshots/step5_filed.jpeg)
+
+---
+
+### Step 6 — Tracking & Download
+> Live status timeline with Download PDF and Track Status actions. 30-day deadline auto-set from filing date.
+
+![Step 6 - Tracking](screenshots/step6_tracking.jpeg)
+
+---
+
+## 👩‍💻 Team
+
+| Name | GitHub |
+|---|---|
+| Sreelakshmi | [![GitHub](https://img.shields.io/badge/GitHub-sreelakshmi-181717?style=flat&logo=github)](https://github.com/ssreelakshmi04) |
+| Shahana | [![GitHub](https://img.shields.io/badge/GitHub-shahana-181717?style=flat&logo=github)](https://github.com/ShahanaKV) |
+
+---
+
+## 🎥 Demo Video
+
+[![RTI-Saarthi Demo](https://img.shields.io/badge/▶_Watch_Demo-YouTube-FF0000?style=for-the-badge&logo=youtube)]()
 
