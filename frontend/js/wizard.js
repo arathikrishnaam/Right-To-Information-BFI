@@ -3,8 +3,9 @@
  * Orchestrates all 5 AI agents through the backend API
  */
 import Api from './api.js';
+import { getCurrentLang } from "./translator.js";
 import VoiceInput from './voice.js';
-import { t, getCurrentLang } from './translator.js';
+
 
 // ── State ──────────────────────────────────────────────────
 const state = {
