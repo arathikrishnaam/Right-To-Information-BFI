@@ -1,49 +1,98 @@
 """
 routing_agent.py — Agent 2: Department Routing Agent
-Identifies the correct PIO and government department for an RTI.
-Uses keyword matching + Claude for intelligent routing.
 """
 import json
 import os
-import anthropic
 from pathlib import Path
 
-client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+from dotenv import load_dotenv
+from google import genai
 
-# Load data files at module load
+load_dotenv()
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+
 DATA_DIR = Path(__file__).parent.parent / "data"
 with open(DATA_DIR / "pio_directory.json") as f:
     PIO_DIRECTORY = json.load(f)
 with open(DATA_DIR / "departments.json") as f:
     DEPARTMENTS = json.load(f)
 
+STATE_SUBJECTS = {"food_ration", "electricity", "water", "housing", "road_infrastructure"}
+
+STATE_ALIASES = {
+    "kerala": "Kerala", "thiruvananthapuram": "Kerala", "trivandrum": "Kerala",
+    "kochi": "Kerala", "ernakulam": "Kerala", "kozhikode": "Kerala",
+    "calicut": "Kerala", "thrissur": "Kerala", "kollam": "Kerala",
+    "malappuram": "Kerala", "palakkad": "Kerala", "kannur": "Kerala",
+    "kasaragod": "Kerala", "alappuzha": "Kerala", "alleppey": "Kerala",
+    "wayanad": "Kerala", "idukki": "Kerala", "kottayam": "Kerala",
+    "pathanamthitta": "Kerala",
+    "tamil nadu": "Tamil Nadu", "tamilnadu": "Tamil Nadu",
+    "chennai": "Tamil Nadu", "madras": "Tamil Nadu", "coimbatore": "Tamil Nadu",
+    "madurai": "Tamil Nadu", "trichy": "Tamil Nadu", "salem": "Tamil Nadu", "tn": "Tamil Nadu",
+    "karnataka": "Karnataka", "bengaluru": "Karnataka", "bangalore": "Karnataka",
+    "mysuru": "Karnataka", "mysore": "Karnataka", "hubli": "Karnataka",
+    "mangalore": "Karnataka", "mangaluru": "Karnataka",
+    "delhi": "Delhi", "new delhi": "Delhi",
+    "maharashtra": "Maharashtra", "mumbai": "Maharashtra", "pune": "Maharashtra",
+    "nagpur": "Maharashtra", "thane": "Maharashtra", "nashik": "Maharashtra",
+    "uttar pradesh": "Uttar Pradesh", "up": "Uttar Pradesh",
+    "lucknow": "Uttar Pradesh", "noida": "Uttar Pradesh", "agra": "Uttar Pradesh",
+    "kanpur": "Uttar Pradesh", "varanasi": "Uttar Pradesh", "prayagraj": "Uttar Pradesh",
+    "west bengal": "West Bengal", "wb": "West Bengal",
+    "kolkata": "West Bengal", "calcutta": "West Bengal",
+    "rajasthan": "Rajasthan", "jaipur": "Rajasthan", "jodhpur": "Rajasthan",
+    "gujarat": "Gujarat", "ahmedabad": "Gujarat", "surat": "Gujarat",
+    "vadodara": "Gujarat", "rajkot": "Gujarat",
+    "andhra pradesh": "Andhra Pradesh", "telangana": "Telangana",
+    "hyderabad": "Telangana", "madhya pradesh": "Madhya Pradesh",
+    "bhopal": "Madhya Pradesh", "indore": "Madhya Pradesh",
+    "bihar": "Bihar", "patna": "Bihar",
+    "punjab": "Punjab", "chandigarh": "Punjab", "amritsar": "Punjab",
+    "haryana": "Haryana", "gurugram": "Haryana", "faridabad": "Haryana",
+    "assam": "Assam", "guwahati": "Assam",
+    "odisha": "Odisha", "bhubaneswar": "Odisha",
+    "jharkhand": "Jharkhand", "ranchi": "Jharkhand",
+    "uttarakhand": "Uttarakhand", "dehradun": "Uttarakhand",
+    "goa": "Goa", "chhattisgarh": "Chhattisgarh", "raipur": "Chhattisgarh",
+}
+
+
+def _normalize_state(raw: str) -> str:
+    if not raw:
+        return "Delhi"
+    key = raw.strip().lower()
+    if key in STATE_ALIASES:
+        normalized = STATE_ALIASES[key]
+        print(f"[RoutingAgent] Alias: '{raw}' → '{normalized}'")
+        return normalized
+    title = raw.strip().title()
+    if title in PIO_DIRECTORY.get("state", {}):
+        return title
+    for k in PIO_DIRECTORY.get("state", {}).keys():
+        if k.lower() == key:
+            return k
+    print(f"[RoutingAgent] Unknown state '{raw}'")
+    return title
+
 
 class RoutingAgent:
-    """
-    Agent 2: Department Routing
-    Input:  Query analysis from Agent 1 + user's state
-    Output: Best matching PIO details
-    """
-
     def route(self, query_analysis: dict, user_state: str = "Delhi") -> dict:
-        """
-        Find the correct PIO for an RTI based on category and location.
-
-        Args:
-            query_analysis: Output from QueryAgent.analyze()
-            user_state: User's state (e.g. "Maharashtra", "Delhi")
-
-        Returns:
-            dict with pio details + department info
-        """
         category = query_analysis.get("category", "other")
-        subject = query_analysis.get("subject", "")
+        state = _normalize_state(user_state)
 
-        # Step 1: Find best PIO using keyword matching
-        pio = self._find_pio_by_category(category, user_state)
+        # Backup: extract state from question text if state PIOs not found
+        if state not in PIO_DIRECTORY.get("state", {}):
+            extracted = self._extract_state_from_question(
+                query_analysis.get("original_question", ""),
+                query_analysis.get("extracted_info", {}).get("location", "")
+            )
+            if extracted:
+                state = extracted
 
-        # Step 2: Use Claude to confirm/refine routing
-        pio = self._claude_confirm_routing(query_analysis, pio, user_state)
+        print(f"[RoutingAgent] category={category} | state={state}")
+        pio = self._find_pio(category, state)
+        print(f"[RoutingAgent] → {pio.get('department')} ({pio.get('id')})")
 
         return {
             "pio": pio,
@@ -51,60 +100,52 @@ class RoutingAgent:
             "filing_url": pio.get("portal", "https://rtionline.gov.in"),
             "category": category,
             "jurisdiction": "central" if pio.get("id", "").startswith("C") else "state",
-            "filing_fee": 0 if query_analysis.get("is_bpl") else DEPARTMENTS.get("filing_fee", {}).get("general", 10)
+            "filing_fee": 0 if query_analysis.get("is_bpl") else
+                          DEPARTMENTS.get("filing_fee", {}).get("general", 10)
         }
 
-    def _find_pio_by_category(self, category: str, state: str) -> dict:
-        """Keyword-based PIO matching."""
+    def _extract_state_from_question(self, question: str, location: str) -> str:
+        combined = f"{question} {location}".lower()
+        for alias, state in STATE_ALIASES.items():
+            if alias in combined:
+                print(f"[RoutingAgent] Found '{alias}' in question → '{state}'")
+                return state
+        return ""
+
+    def _find_pio(self, category: str, state: str) -> dict:
         dept_info = DEPARTMENTS["categories"].get(category, {})
+        keywords = [k.lower() for k in dept_info.get("keywords", [])]
         central_id = dept_info.get("central_pio_id")
 
-        # Try state PIO first for local issues
-        local_categories = ["road_infrastructure", "electricity", "water", "housing"]
-        if category in local_categories and state in PIO_DIRECTORY.get("state", {}):
-            state_pios = PIO_DIRECTORY["state"][state]
-            # Match by category keywords
-            for pio in state_pios:
-                pio_cats = [c.lower() for c in pio.get("categories", [])]
-                if any(kw in " ".join(pio_cats) for kw in dept_info.get("keywords", [])):
-                    return pio
+        if category in STATE_SUBJECTS:
+            state_pios = PIO_DIRECTORY.get("state", {}).get(state, [])
+            print(f"[RoutingAgent] State PIOs for '{state}': {len(state_pios)}")
             if state_pios:
-                return state_pios[0]  # fallback to first state PIO
+                for pio in state_pios:
+                    cats = " ".join(c.lower() for c in pio.get("categories", []))
+                    if any(kw in cats for kw in keywords) or category in cats:
+                        return pio
+                return state_pios[0]
 
-        # Use central PIO
         if central_id:
             for pio in PIO_DIRECTORY.get("central", []):
                 if pio["id"] == central_id:
                     return pio
 
-        # Default fallback
-        return PIO_DIRECTORY["central"][0]
+        for pio in PIO_DIRECTORY.get("central", []):
+            cats = " ".join(c.lower() for c in pio.get("categories", []))
+            if any(kw in cats for kw in keywords):
+                return pio
 
-    def _claude_confirm_routing(self, query_analysis: dict, suggested_pio: dict, state: str) -> dict:
-        """Use Claude to validate and optionally improve routing."""
-        try:
-            prompt = f"""Given this RTI query analysis and suggested PIO, confirm if the routing is correct.
-Query Analysis: {json.dumps(query_analysis, indent=2)}
-Suggested PIO: {json.dumps(suggested_pio, indent=2)}
-User State: {state}
+        fallback_map = {
+            "food_ration": "C009", "health": "C002", "education": "C003",
+            "road_infrastructure": "C004", "postal": "C005", "income_tax": "C006",
+            "employment": "C007", "lpg_petroleum": "C008", "housing": "C010",
+            "railways": "C001",
+        }
+        fallback_id = fallback_map.get(category, "C009")
+        for pio in PIO_DIRECTORY.get("central", []):
+            if pio["id"] == fallback_id:
+                return pio
 
-Respond with JSON only:
-{{"routing_correct": true/false, "reason": "...", "better_department": "if different department is better"}}"""
-
-            response = client.messages.create(
-                model="claude-sonnet-4-5",
-                max_tokens=300,
-                messages=[{"role": "user", "content": prompt}]
-            )
-
-            raw = response.content[0].text.strip()
-            if raw.startswith("```"):
-                raw = raw.split("```")[1]
-                if raw.startswith("json"):
-                    raw = raw[4:]
-
-            result = json.loads(raw)
-            # If Claude says routing is wrong, log it but keep suggested (for hackathon demo)
-            return suggested_pio
-        except Exception:
-            return suggested_pio
+        return PIO_DIRECTORY["central"][0]      

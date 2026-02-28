@@ -1,156 +1,152 @@
 """
 drafting_agent.py — Agent 3: RTI Drafting Agent
-Generates a legally compliant RTI application in proper format.
 """
 import json
 import os
+import re
 from datetime import datetime, timedelta
-import anthropic
 from pathlib import Path
 
-client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+from dotenv import load_dotenv
+from google import genai
+from google.genai import types
+
+load_dotenv()
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+MODEL = "models/gemini-2.0-flash-lite-lite"
 
 DATA_DIR = Path(__file__).parent.parent / "data"
 with open(DATA_DIR / "rti_templates.json") as f:
     TEMPLATES = json.load(f)
 
 
+def _clean_json(raw: str) -> str:
+    raw = raw.strip()
+    raw = re.sub(r"^```(?:json)?\s*", "", raw)
+    raw = re.sub(r"\s*```$", "", raw)
+    return raw.strip()
+
+
 class DraftingAgent:
-    """
-    Agent 3: RTI Application Drafting
-    Input:  Query analysis + Routing info + Applicant details
-    Output: Complete, legally valid RTI application text + formal questions
-    """
-
-    SYSTEM_PROMPT = """You are a legal expert specializing in drafting Right to Information (RTI)
-applications under the RTI Act 2005, India.
-
-Your task is to generate a complete, formal RTI application.
-
-RULES:
-1. Use formal, legal language throughout.
-2. Questions must be specific, clear, and answerable — avoid vague questions.
-3. Include all mandatory sections as per RTI Act 2005.
-4. Respond ONLY with valid JSON, no extra text.
-5. Questions should not ask for opinions, only facts and documents.
-
-OUTPUT FORMAT:
-{
-  "subject": "Concise subject line (max 100 chars)",
-  "formal_questions": [
-    "Specific Question 1 in proper RTI legal language",
-    "Specific Question 2",
-    "Specific Question 3",
-    "Specific Question 4",
-    "Specific Question 5"
-  ],
-  "full_application_text": "Complete RTI application as plain text with all sections",
-  "relevant_sections": ["RTI Act Section X", "..."],
-  "estimated_success_probability": 0.85,
-  "tips": "One tip to increase success rate"
-}"""
-
     def draft(self, query_analysis: dict, routing_info: dict, applicant: dict) -> dict:
-        """
-        Draft a complete RTI application.
-
-        Args:
-            query_analysis: Output from QueryAgent
-            routing_info: Output from RoutingAgent
-            applicant: {name, address, mobile, email, is_bpl, bpl_card_no}
-
-        Returns:
-            dict with full RTI draft
-        """
         pio = routing_info.get("pio", {})
         today = datetime.now()
         deadline = today + timedelta(days=30)
 
-        prompt = f"""Draft an RTI application with these details:
+        fee_clause = (
+            "I am a BPL cardholder and am exempt from the application fee under Section 7(5) of the RTI Act, 2005."
+            if applicant.get("is_bpl")
+            else "I am enclosing the application fee of Rs. 10/- as required under the RTI Act, 2005."
+        )
 
-CITIZEN'S ORIGINAL QUESTION: {query_analysis.get('original_question')}
-SUBJECT: {query_analysis.get('subject')}
-CATEGORY: {query_analysis.get('category')}
-EXTRACTED INFO: {json.dumps(query_analysis.get('extracted_info', {}), indent=2)}
-SUGGESTED QUESTIONS: {json.dumps(query_analysis.get('suggested_questions', []), indent=2)}
-
-DEPARTMENT: {pio.get('department')}
-PIO NAME: {pio.get('pio_name')}
-PIO ADDRESS: {pio.get('address')}
-
-APPLICANT:
-- Name: {applicant.get('name')}
-- Address: {applicant.get('address')}
-- Mobile: {applicant.get('mobile')}
-- Email: {applicant.get('email')}
-- BPL Status: {applicant.get('is_bpl', False)}
-- Date: {today.strftime('%d %B %Y')}
-
-Generate a complete formal RTI application. The full_application_text must include:
-1. Addressee (To: The PIO, Department)
-2. Subject line
-3. Introduction paragraph with applicant identity
-4. Fee clause (BPL exempt or Rs.10 paid)
-5. Numbered list of specific questions
-6. Request for 30-day response citing Section 7(1)
-7. Transfer clause citing Section 6(3)
-8. Declaration of citizenship
-9. Signature block"""
+        prompt = (
+            "You are a senior legal expert specializing in RTI Act 2005, India.\n"
+            "Draft a complete, formal RTI application and return ONLY a valid JSON object.\n"
+            "NO markdown, NO code fences, NO extra text.\n\n"
+            "JSON fields:\n"
+            "- subject: formal subject line under 100 chars, specific to the issue\n"
+            "- formal_questions: array of exactly 5 RTI questions — each must be a complete formal "
+            "legal sentence specific to the citizen's actual issue. Include dates, locations, "
+            "document names. Never write generic questions.\n"
+            "- full_application_text: complete RTI letter as plain text (see format below)\n"
+            "- relevant_sections: array of applicable RTI/other Act sections\n"
+            "- estimated_success_probability: float 0.0-1.0\n"
+            "- tips: one specific actionable tip for this particular RTI\n\n"
+            f"CITIZEN ISSUE: {query_analysis.get('original_question')}\n"
+            f"SUBJECT: {query_analysis.get('subject')}\n"
+            f"CATEGORY: {query_analysis.get('category')}\n"
+            f"LOCATION: {query_analysis.get('extracted_info', {}).get('location', 'Not specified')}\n"
+            f"TIME PERIOD: {query_analysis.get('extracted_info', {}).get('time_period', 'as mentioned')}\n"
+            f"SPECIFIC ISSUE: {query_analysis.get('extracted_info', {}).get('specific_issue', '')}\n\n"
+            f"DEPARTMENT: {pio.get('department')}\n"
+            f"PIO NAME: {pio.get('pio_name')}\n"
+            f"PIO ADDRESS: {pio.get('address')}\n\n"
+            f"APPLICANT NAME: {applicant.get('name')}\n"
+            f"APPLICANT ADDRESS: {applicant.get('address')}\n"
+            f"MOBILE: {applicant.get('mobile')}\n"
+            f"EMAIL: {applicant.get('email')}\n"
+            f"DATE: {today.strftime('%d %B %Y')}\n"
+            f"FEE CLAUSE: {fee_clause}\n\n"
+            "full_application_text FORMAT (plain text, no JSON inside):\n"
+            "To,\n"
+            "The Public Information Officer,\n"
+            "[Department Name],\n"
+            "[Address]\n\n"
+            "Subject: [specific subject]\n\n"
+            "Sir/Madam,\n\n"
+            "I, [Name], a citizen of India residing at [Address], hereby submit this application "
+            "under Section 6(1) of the Right to Information Act, 2005 to seek the following "
+            "information from your office:\n\n"
+            "[Numbered questions — specific, formal, legal language]\n\n"
+            "[Fee clause]\n\n"
+            "I request that the above information be furnished within 30 days as mandated under "
+            "Section 7(1) of the RTI Act, 2005. Should the information not pertain to your "
+            "office, kindly transfer this application to the concerned authority under Section "
+            "6(3) of the RTI Act, 2005.\n\n"
+            "I hereby declare that I am a citizen of India.\n\n"
+            "Yours faithfully,\n"
+            "[Name]\n"
+            "Date: [Date]\n"
+            "Mobile: [Mobile]\n"
+            "Email: [Email]"
+        )
 
         try:
-            response = client.messages.create(
-                model="claude-sonnet-4-5",
-                max_tokens=2000,
-                system=self.SYSTEM_PROMPT,
-                messages=[{"role": "user", "content": prompt}]
+            response = client.models.generate_content(
+                model=MODEL,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    temperature=0.1,
+                    max_output_tokens=2500
+                )
             )
-
-            raw = response.content[0].text.strip()
-            if raw.startswith("```"):
-                raw = raw.split("```")[1]
-                if raw.startswith("json"):
-                    raw = raw[4:]
-
-            result = json.loads(raw)
+            raw = response.text
+            print(f"[DraftingAgent] Raw response: {raw[:300]}...")
+            cleaned = _clean_json(raw)
+            result = json.loads(cleaned)
             result["filed_date"] = today.strftime("%d/%m/%Y")
             result["deadline_date"] = deadline.strftime("%d/%m/%Y")
+            print(f"[DraftingAgent] Subject: {result.get('subject')}")
             return result
 
         except Exception as e:
-            # Fallback: use template
+            print(f"[DraftingAgent] Error: {e}, using fallback")
             return self._fallback_draft(query_analysis, routing_info, applicant, today, deadline)
 
     def _fallback_draft(self, qa, ri, applicant, today, deadline) -> dict:
-        """Template-based fallback if Claude fails."""
         pio = ri.get("pio", {})
-        questions = qa.get("suggested_questions", [qa.get("subject", "Please provide relevant information.")])
+        questions = qa.get("suggested_questions", [])
+        if not questions:
+            questions = [qa.get("subject", "Please provide relevant information.")]
         q_text = "\n".join([f"{i+1}. {q}" for i, q in enumerate(questions)])
-
-        full_text = f"""To,
-The Public Information Officer,
-{pio.get('department', 'Concerned Department')},
-{pio.get('address', 'India')}
-
-Subject: {qa.get('subject', 'Request for Information under RTI Act 2005')}
-
-Sir/Madam,
-
-I, {applicant.get('name')}, resident of {applicant.get('address')}, hereby request the following information under Section 6(1) of the Right to Information Act, 2005:
-
-{q_text}
-
-{"I am a BPL cardholder and am exempt from fee under Section 7(5) of the RTI Act, 2005." if applicant.get('is_bpl') else "I am enclosing the application fee of Rs. 10/- as required."}
-
-I request that the above information be provided within 30 days as per Section 7(1) of the RTI Act, 2005. If the information is not available with your office, please transfer this application under Section 6(3) of the RTI Act, 2005.
-
-I hereby declare that I am a citizen of India.
-
-Yours faithfully,
-{applicant.get('name')}
-Date: {today.strftime('%d %B %Y')}
-Mobile: {applicant.get('mobile')}
-Email: {applicant.get('email')}"""
-
+        fee = (
+            "I am a BPL cardholder and am exempt from fee under Section 7(5) of the RTI Act, 2005."
+            if applicant.get("is_bpl")
+            else "I am enclosing the application fee of Rs. 10/- as required."
+        )
+        full_text = (
+            f"To,\n"
+            f"The Public Information Officer,\n"
+            f"{pio.get('department', 'Concerned Department')},\n"
+            f"{pio.get('address', 'India')}\n\n"
+            f"Subject: {qa.get('subject', 'Request for Information under RTI Act 2005')}\n\n"
+            f"Sir/Madam,\n\n"
+            f"I, {applicant.get('name')}, a citizen of India residing at "
+            f"{applicant.get('address')}, hereby submit this application under Section 6(1) "
+            f"of the Right to Information Act, 2005 to seek the following information:\n\n"
+            f"{q_text}\n\n"
+            f"{fee}\n\n"
+            f"I request that the above information be furnished within 30 days as mandated "
+            f"under Section 7(1) of the RTI Act, 2005. Should the information not pertain to "
+            f"your office, kindly transfer this application to the concerned authority under "
+            f"Section 6(3) of the RTI Act, 2005.\n\n"
+            f"I hereby declare that I am a citizen of India.\n\n"
+            f"Yours faithfully,\n"
+            f"{applicant.get('name')}\n"
+            f"Date: {today.strftime('%d %B %Y')}\n"
+            f"Mobile: {applicant.get('mobile')}\n"
+            f"Email: {applicant.get('email')}"
+        )
         return {
             "subject": qa.get("subject", "Request for Information"),
             "formal_questions": questions,
@@ -160,4 +156,4 @@ Email: {applicant.get('email')}"""
             "tips": "Be specific about dates and locations in your query.",
             "filed_date": today.strftime("%d/%m/%Y"),
             "deadline_date": deadline.strftime("%d/%m/%Y")
-        }
+        }        

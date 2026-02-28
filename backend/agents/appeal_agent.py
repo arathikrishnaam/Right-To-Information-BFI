@@ -1,45 +1,43 @@
 """
 appeal_agent.py — Agent 5: Follow-up & Appeal Agent
-Auto-generates First and Second Appeals when RTI is unanswered.
 """
 import json
 import os
-from datetime import datetime, timedelta
-import anthropic
+import re
+from datetime import datetime
 from pathlib import Path
 
-client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+from dotenv import load_dotenv
+from google import genai
+from google.genai import types
+
+load_dotenv()
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+MODEL = "models/gemini-2.0-flash-lite-lite"
 
 DATA_DIR = Path(__file__).parent.parent / "data"
 with open(DATA_DIR / "rti_templates.json") as f:
     TEMPLATES = json.load(f)
 
 
+def _clean_json(raw: str) -> str:
+    raw = raw.strip()
+    raw = re.sub(r"^```(?:json)?\s*", "", raw)
+    raw = re.sub(r"\s*```$", "", raw)
+    return raw.strip()
+
+
 class AppealAgent:
-    """
-    Agent 5: Appeals & Follow-up
-    Monitors RTI status and auto-generates appeals when needed.
-    """
-
     def check_and_appeal(self, rti_record: dict) -> dict:
-        """
-        Check if an RTI needs a follow-up or appeal.
-
-        Args:
-            rti_record: RTI application record from database
-
-        Returns:
-            dict with action taken and appeal draft if applicable
-        """
-        filed_date = datetime.fromisoformat(rti_record.get("filed_at", datetime.now().isoformat()))
+        filed_date = datetime.fromisoformat(
+            rti_record.get("filed_at", datetime.now().isoformat())
+        )
         days_elapsed = (datetime.now() - filed_date).days
         status = rti_record.get("status", "filed")
 
         if status == "response_received":
             return {"action": "none", "message": "RTI already responded to."}
-
         if days_elapsed >= 30 and not rti_record.get("appeal_filed"):
-            # Generate First Appeal
             appeal = self.generate_first_appeal(rti_record)
             return {
                 "action": "first_appeal",
@@ -63,30 +61,26 @@ class AppealAgent:
             }
 
     def generate_first_appeal(self, rti_record: dict) -> str:
-        """Generate a First Appeal application using Claude."""
         try:
-            prompt = f"""Generate a First Appeal under Section 19(1) of RTI Act 2005.
-
-RTI Details:
-- Reference Number: {rti_record.get('ref_number')}
-- Filed Date: {rti_record.get('filed_at')}
-- Department: {rti_record.get('department')}
-- Subject: {rti_record.get('subject')}
-- Applicant: {rti_record.get('applicant_name')}
-
-Generate a formal First Appeal letter. No response was received in 30 days.
-Include legal provisions: Section 19(1), Section 7(1), 18(1)(b).
-Return plain text of the appeal letter only."""
-
-            response = client.messages.create(
-                model="claude-sonnet-4-5",
-                max_tokens=800,
-                messages=[{"role": "user", "content": prompt}]
+            prompt = (
+                "Generate a First Appeal letter under Section 19(1) of RTI Act 2005. "
+                "Return plain text only, no markdown.\n\n"
+                f"Reference Number: {rti_record.get('ref_number')}\n"
+                f"Filed Date: {rti_record.get('filed_at', '')[:10]}\n"
+                f"Department: {rti_record.get('department')}\n"
+                f"Subject: {rti_record.get('subject')}\n"
+                f"Applicant: {rti_record.get('applicant_name')}\n\n"
+                "No response received within 30 days. "
+                "Cite Section 19(1), Section 7(1), and Section 18(1)(b)."
             )
-            return response.content[0].text.strip()
-
-        except Exception:
-            # Fallback template
+            response = client.models.generate_content(
+                model=MODEL,
+                contents=prompt,
+                config=types.GenerateContentConfig(temperature=0.1, max_output_tokens=800)
+            )
+            return response.text.strip()
+        except Exception as e:
+            print(f"[AppealAgent] generate_first_appeal error: {e}")
             tmpl = TEMPLATES["first_appeal_template"]["body"]
             return tmpl.format(
                 department_name=rti_record.get("department", "Concerned Department"),
@@ -99,43 +93,35 @@ Return plain text of the appeal letter only."""
             )
 
     def predict_success(self, query_analysis: dict, routing_info: dict) -> dict:
-        """
-        AI-powered RTI success probability predictor.
-        Analyzes multiple factors to estimate success likelihood.
-        """
         try:
-            prompt = f"""Analyze this RTI application and predict its success probability.
-
-Category: {query_analysis.get('category')}
-Subject: {query_analysis.get('subject')}
-Questions: {json.dumps(query_analysis.get('suggested_questions', []))}
-Department Jurisdiction: {routing_info.get('jurisdiction', 'central')}
-Urgency: {query_analysis.get('urgency')}
-
-Respond with JSON only:
-{{
-  "success_probability": 0.0-1.0,
-  "factors": {{
-    "question_clarity": 0.0-1.0,
-    "department_responsiveness": 0.0-1.0,
-    "information_availability": 0.0-1.0
-  }},
-  "risk_level": "low|medium|high",
-  "tips": ["tip1", "tip2"],
-  "estimated_response_days": 15-30
-}}"""
-            response = client.messages.create(
-                model="claude-sonnet-4-5",
-                max_tokens=400,
-                messages=[{"role": "user", "content": prompt}]
+            prompt = (
+                "Analyze this RTI application and predict success probability. "
+                "Return ONLY a valid JSON object, no markdown, no code fences.\n\n"
+                "JSON fields:\n"
+                "- success_probability: float 0-1\n"
+                "- factors: object with question_clarity, department_responsiveness, "
+                "information_availability (all floats 0-1)\n"
+                "- risk_level: low|medium|high\n"
+                "- tips: array of exactly 2 specific actionable tip strings for this RTI\n"
+                "- estimated_response_days: integer\n\n"
+                f"Category: {query_analysis.get('category')}\n"
+                f"Subject: {query_analysis.get('subject')}\n"
+                f"Urgency: {query_analysis.get('urgency')}\n"
+                f"Jurisdiction: {routing_info.get('jurisdiction', 'central')}\n"
+                f"Department: {routing_info.get('department')}\n"
+                f"Issue: {query_analysis.get('extracted_info', {}).get('specific_issue', '')}\n"
+                f"Questions: {json.dumps(query_analysis.get('suggested_questions', []))}"
             )
-            raw = response.content[0].text.strip()
-            if raw.startswith("```"):
-                raw = raw.split("```")[1]
-                if raw.startswith("json"):
-                    raw = raw[4:]
-            return json.loads(raw)
-        except Exception:
+            response = client.models.generate_content(
+                model=MODEL,
+                contents=prompt,
+                config=types.GenerateContentConfig(temperature=0.1, max_output_tokens=400)
+            )
+            raw = response.text
+            print(f"[AppealAgent] predict_success raw: {raw[:200]}")
+            return json.loads(_clean_json(raw))
+        except Exception as e:
+            print(f"[AppealAgent] predict_success error: {e}")
             return {
                 "success_probability": 0.78,
                 "factors": {
@@ -146,4 +132,4 @@ Respond with JSON only:
                 "risk_level": "low",
                 "tips": ["Be specific about dates", "Include specific document names"],
                 "estimated_response_days": 22
-            }
+            }            
